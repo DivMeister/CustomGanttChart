@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    #gantt-chart {
+      width: 100%;
+      height: 100%;
+    }
+    .gantt_task_container {
+      display: none;
+    }
+    .gantt_task_line {
+      background-color: #1e88e5 !important; /* Custom color for task bars */
+      border-radius: 14px;
+      border: 1.5px solid #929292;
+    }
+    .gantt_task_progress {
+      background-color: #0253aa; /* Set the task bar color to black */
+      border-radius: 14px; /* Set the border radius to make the borders rounder */
+    }
+    .custom-heading {
+      background-color: #ffffff; /* Custom color for heading cells */
+    }
+
+    .gantt_grid_head {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #f5f5f5;
+    }
+    .highlighted_task.gantt_task_line {
+      background-color: #929292;
+      border-color: rgba(0,0,0,0.3);
+    }
+    .week-end {
+     background: #e6e6e6; 
+    }
+    .gantt_grid_data .gantt_row.odd:hover, .gantt_grid_data .gantt_row:hover,
+    .gantt_grid_data .gantt_row.gantt_selected,
+    .gantt_grid_data .gantt_row.odd.gantt_selected,
+    .gantt_task_row.gantt_selected{
+    background-color: #c2c2c2; 
+    }
+  </style>
+</head>
+<body>
+  <div id="gantt-chart"></div>
+  <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
+  <script>
+    //Random Input data in string format that is converted below into JSON///////////////////////////////
+    const dataString = "id: 1, text: Task 1, outcome: In Progress, today_date: 2023-06-21 17:30, start_date: 2023-06-16, end_date: , days_allowed: 1, actual_end_date: , expected_end_date: 2023-06-23, completed_by: Benjamin, id: 2, text: Task 2, outcome: In Progress - Late, today_date: 2023-06-21 16:30, start_date: 2023-06-17, end_date: , days_allowed: 1, actual_end_date: , expected_end_date: 2023-06-20, completed_by: Olivia, id: 3, text: Task 3, outcome: Completed, today_date: 2023-06-21 17:30, start_date: 2023-06-18, end_date: , days_allowed: 1, actual_end_date: 2023-06-20, expected_end_date: 2023-06-23, completed_by: Sophia, id: 4, text: Task 4, outcome: Completed - Late, today_date: 2023-06-21 17:30, start_date: 2023-06-18, end_date: , days_allowed: 1, actual_end_date: 2023-06-21, expected_end_date: 2023-06-20, completed_by: Ethan";
+    
+    //Split data correcctly and parsed to JSON////////////////////////
+    const keyValuePairs = dataString.split(', ');
+    const records = [];
+    let record = {};
+    keyValuePairs.forEach(pair => {
+      const [key, value] = pair.split(': ');
+      const trimmedKey = key.trim();
+      const trimmedValue = value.trim();
+        if (trimmedKey === "id") {
+          record = {};
+          record[trimmedKey] = trimmedValue;
+        } else if (trimmedKey === "completed_by") {
+          record[trimmedKey] = trimmedValue;
+          records.push(record);
+          } else {
+          record[trimmedKey] = trimmedValue;
+            }
+      });
+      const tasks = {
+        data: records,
+        links: []
+    };
+        //Modify data for each scenario and apply it accordingly//////////////
+        tasks.data.forEach(function(task) {
+        if (!task.actual_end_date)
+        {
+          if (task.expected_end_date >= task.today_date)
+          {
+            //set end date///////////////////////////////////////
+            task.end_date = task.expected_end_date ;
+            //calculate progress////////////////////////////////
+            const startDate = new Date(task.start_date);
+            const endDate = new Date(task.end_date);
+            const currentDate = new Date(task.today_date);
+            const totalSeconds = Math.floor((endDate - startDate) / 1000);
+            const currentSeconds = Math.floor((currentDate - startDate) / 1000);
+            const percentage = (currentSeconds * 1.0 / totalSeconds);
+            task.progress = percentage;
+            console.log("1, Percentage: ", task.progress);
+          }else
+          {
+          //set end date///////////////////////////////////////
+          task.end_date = task.today_date;
+          //calculate progress////////////////////////////////
+          const startDate = new Date(task.start_date);
+          const endDate = new Date(task.end_date);
+          const currentDate = new Date(task.expected_end_date);
+          const totalSeconds = Math.floor((endDate - startDate) / 1000);
+          const currentSeconds = Math.floor((currentDate - startDate) / 1000);
+          const percentage = (currentSeconds * 1.0 / totalSeconds);
+          task.progress = percentage;
+          task.color = "#f86a6a !important";
+          console.log("3, Percentage: ", task.progress);
+          }
+        }else
+        {
+          if (task.actual_end_date <= task.expected_end_date)
+        {
+          //set end date///////////////////////////////////////
+          task.end_date = task.expected_end_date ;
+          //calculate progress////////////////////////////////
+          const startDate = new Date(task.start_date);
+          const endDate = new Date(task.end_date);
+          var actualEndDate = new Date(task.actual_end_date);
+          actualEndDate.setDate(actualEndDate.getDate() + 1);
+          const currentDate = new Date(actualEndDate);
+          const totalSeconds = Math.floor((endDate - startDate) / 1000);
+          const currentSeconds = Math.floor((currentDate - startDate) / 1000);
+          const percentage = (currentSeconds * 1.0 / totalSeconds);
+          task.progress = percentage;
+          console.log("2, Percentage: ", task.progress);
+        }else
+        {
+          //set end date///////////////////////////////////////
+          var actualEndDate = new Date(task.actual_end_date);
+          actualEndDate.setDate(actualEndDate.getDate() + 1);
+          task.end_date = task.actual_end_date;
+          //calculate progress////////////////////////////////
+          const startDate = new Date(task.start_date);
+          const endDate = new Date(task.end_date);
+          const currentDate = new Date(task.expected_end_date);
+          const totalSeconds = Math.floor((endDate - startDate) / 1000);
+          const currentSeconds = Math.floor((currentDate - startDate) / 1000);
+          const percentage = (currentSeconds * 1.0 / totalSeconds);
+          task.progress = percentage;
+          task.color = "#f86a6a !important";
+          console.log("4, Percentage: ", task.progress);
+        }
+        }
+      });
+        console.log(tasks);
+
+      //Chart////////////////////////////////////////////////////////////////////////////
+      //Tooltip////////////////////////////////////////////////////////////////////////
+      gantt.plugins({ 
+        tooltip: true 
+      }); 
+      gantt.templates.tooltip_text = function(start,end,task){
+        return "<b>Process Description: </b> "+task.text+ "<br/><b>Outcome: </b>"+ task.outcome + "<br/><b>Completed By: </b>" + task.completed_by + "<br/><b>Start Date: </b>" + task.start_date;
+      };
+      //Today Marker///////////////
+      gantt.plugins({
+        marker: true
+      });
+      gantt.addMarker({ 
+        start_date: new Date(), 
+        css: "today", 
+        text: 'Today',
+      });
+      //Heading///////////////////////////////////////////////////////////////////////    
+      gantt.templates.scale_cell_class = function (date) {
+        return 'custom-heading';
+      };
+      //No Text in bars/////////////////////////////////////////////////////
+      gantt.templates.task_text = function (start, end, task) {
+        return '';
+      };
+      //Left columns config/////////////////////////////////////////////////////////////////////////
+      gantt.config.columns = [
+        { name: "text", label: "Task Name", align: "center", width: 200 },
+        { name: "outcome", label: "Outcome", align: "center", width: 120 },
+        { name: "completed_by", label: "User", align: "center", width: 100 },
+        { name: "start_date", label: "Start Date", align: "center", width: 85 },
+      //{ name: "expected_end_date", label: "Exp End Date", align: "center", width: 75 },
+        { name: "actual_end_date", label: "End Date", align: "center", width: 75 }
+      ];
+      //Grey weekends/////////////////////////////////////////////////
+      gantt.templates.scale_cell_class = function(date){
+        if(date.getDay()==0||date.getDay()==6){
+          return "week-end";
+        }
+      };
+      gantt.templates.timeline_cell_class = function(task,date){
+        if(date.getDay()==0||date.getDay()==6){ 
+          return "week-end" ;
+        }
+      };
+      //Gantt Config//////////////////////////////////////////////////////////////////
+      gantt.config.row_height = 20;
+      gantt.config.work_time = true;
+      gantt.config.scale_height = 50;
+      gantt.config.xml_date = '%Y-%m-%d %H:%i';
+      gantt.config.readonly = true;
+      gantt.config.show_task_cells = true;
+      gantt.config.min_column_width = 30;
+	    gantt.config.scales = [
+		    {unit: "month", step: 1, format: "%F, %Y"},
+		    {unit: "day", step: 1, format: "%D"},
+        {unit: "day", step: 1, format: "%d"}
+	    ];
+      gantt.init('gantt-chart');
+      gantt.parse(tasks);
+//////////////////////////////////////////////////////////////////////////////////////////
+  </script>
+</body>
+</html>
