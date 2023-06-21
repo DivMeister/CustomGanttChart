@@ -14,4 +14,4 @@ When the progress bar is displayed in blue, it signifies that the user has ample
 
 Conversely, a red progress bar indicates that the user has either failed to complete the task within the due date or has marked it as completed after the specified deadline.
 
-For further exploration and implementation, please refer to the attached code in this repository, providing a comprehensive view of this project.
+For further exploration and implementation, please refer to the attached code file (Gantt Chart.html) in this repository, providing a comprehensive view of this project.
