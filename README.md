@@ -1,5 +1,5 @@
 # CustomGanttChart
-This is an example of a custom Gantt Chart using DHTML library that I have Created for enterprise use.
+This is an example of a custom Gantt Chart using DHTML library that I have Created for enterprise use. Note that this is a basic preview and could get more advanced with added JS.
 
 Attached below is a snippet of how this looks in a web environment:
 ![Gantt](https://github.com/DivMeister/CustomGanttChart/assets/90267019/3f7956e6-31c1-4eec-91ce-c2700720e5b2)
